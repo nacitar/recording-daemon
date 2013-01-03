@@ -51,20 +51,21 @@ def save_recordings(large = False):
 	for filepath in file_list:
 		filename=os.path.basename(filepath)
 		print "Saving file "+filename
-		
-		newname="keepme_"+filename
-		newpath=os.path.join(ramdisk_path,newname)
-		try:
-			# move it locally so it's fast
-			os.rename(filepath,newpath)
-		except OSError:
-			# fallback to skipping that step
-			newpath=filepath
-		# move it to persistent storage
-		try:
-			os.rename(newpath,os.path.join(storage_path,filename))
-		except OSError:
-			print "Ignoring error moving file to persistent storage."
+
+		if not filename.startswith("keepme_"):
+			newname="keepme_"+filename
+			newpath=os.path.join(ramdisk_path,newname)
+			try:
+				# move it locally so it's fast
+				os.rename(filepath,newpath)
+			except OSError:
+				# fallback to skipping that step
+				newpath=filepath
+			# move it to persistent storage
+			try:
+				os.rename(newpath,os.path.join(storage_path,filename))
+			except OSError:
+				print "Ignoring error moving file to persistent storage."
 			
 
 def delete_recordings():
