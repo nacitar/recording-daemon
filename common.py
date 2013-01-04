@@ -3,6 +3,52 @@
 import os
 import os.path
 import time
+import inspect
+
+def get_lockfile_path():
+	return os.path.join(os.path.dirname(inspect.currentframe().f_code.co_filename),"filemgmt.lock")
+
+def get_lock(is_save):
+	""" This is not a great lock implementation but it solves my needs.
+	
+	Returns True if a lock was obtained, false if another lock OF THIS TYPE is already there.
+	It keeps retrying for the lock if a _different_ lock is already there.
+	"""
+	lockfile_path = get_lockfile_path()
+
+	# Create only, use exclusive access, open rw; this is essentially atomic.
+
+	operation=["d","s"][is_save]
+
+	while True:
+		try:
+			# Try to obtain the lock first
+			fd=os.open(lockfile_path, os.O_EXCL | os.O_RDWR | os.O_CREAT)
+			os.write(fd,operation)
+			os.close(fd)
+			return True
+		except OSError:
+			# Fallback to trying to see if we don't need the lock in the first place
+			try:
+				fd=os.open(lockfile_path, os.O_RDONLY)
+				data=os.read(fd,1)
+				os.close(fd)
+				if data == operation:
+					print "Redundant lock; this operation is already running."
+					return False 
+			except OSError:
+				pass
+		# don't hammer the machine
+		print "Lock failed, sleeping..."
+		time.sleep(1)
+	raise Exception("unreachable")
+
+def release_lock():
+	""" Releases the lock. """
+	try:
+		os.remove(get_lockfile_path())
+	except OSError:
+		pass
 
 # CUSTOMIZE THESE
 def get_ramdisk_path():
