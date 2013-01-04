@@ -8,7 +8,7 @@ import inspect
 def get_lockfile_path():
 	return os.path.join(os.path.dirname(inspect.currentframe().f_code.co_filename),"filemgmt.lock")
 
-def get_lock(is_save):
+def get_lock(operation):
 	""" This is not a great lock implementation but it solves my needs.
 	
 	Returns True if a lock was obtained, false if another lock OF THIS TYPE is already there.
@@ -17,8 +17,6 @@ def get_lock(is_save):
 	lockfile_path = get_lockfile_path()
 
 	# Create only, use exclusive access, open rw; this is essentially atomic.
-
-	operation=["d","s"][is_save]
 
 	while True:
 		try:
