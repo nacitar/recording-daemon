@@ -1,1 +1,18 @@
-text=auto
+# Set default behavior, in case users don't have core.autocrlf set.
+* text=auto
+
+# Make the textual files have the text setting, so things never have the wrong line endings.
+*.java text
+*.ahk text eol=crlf
+*.sh text eol=lf
+*.c text
+*.cpp text
+*.h text
+*.xml text
+*.txt text
+*.yml text
+
+# Force binary files to have binary settings
+*.png binary
+*.jpg binary
+*.jpeg binaryext=auto
